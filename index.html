@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>A Letter for You</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600&family=Crimson+Text:wght@400;600&family=Space+Grotesk:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --cream: #faf8f3;
+            --paper: #f5f2eb;
+            --beige-100: #f0ede3;
+            --beige-200: #e8e2d3;
+            --beige-300: #ddd3c0;
+            --beige-400: #c9b99a;
+            --beige-500: #b5a082;
+            --beige-600: #9a8568;
+            --beige-700: #7d6b4f;
+            --beige-800: #5c4e3a;
+            --beige-900: #3a2f22;
+            --gold: #d4af37;
+            --gold-dark: #b8941f;
+            --shadow: rgba(0, 0, 0, 0.1);
+            --shadow-deep: rgba(0, 0, 0, 0.2);
+        }
+
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: radial-gradient(ellipse at top, var(--cream) 0%, var(--beige-100) 50%, var(--beige-200) 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: auto;
+            position: relative;
+            padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+        }
+
+        .wood-texture {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background:
+                repeating-linear-gradient(
+                    90deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(160, 134, 104, 0.03) 2px,
+                    rgba(160, 134, 104, 0.03) 4px
+                ),
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 1px,
+                    rgba(160, 134, 104, 0.02) 1px,
+                    rgba(160, 134, 104, 0.02) 2px
+                );
+            z-index: -1;
+        }
+
+        .floating-particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: var(--gold);
+            border-radius: 50%;
+            opacity: 0.3;
+            animation: float-particle 8s linear infinite;
+        }
+
+        @keyframes float-particle {
+            0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.3; }
+            90% { opacity: 0.1; }
+            100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
+        }
+
+        .datetime-display {
+            position: fixed;
+            top: calc(25px + env(safe-area-inset-top));
+            right: 25px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: clamp(10px, 2.5vw, 12px);
+            color: var(--beige-700);
+            background: rgba(250, 248, 243, 0.95);
+            padding: clamp(10px, 2vw, 12px) clamp(12px, 2.5vw, 15px);
+            border-radius: 15px;
+            border: 1px solid var(--beige-300);
+            backdrop-filter: blur(20px);
+            box-shadow: 0 10px 40px var(--shadow);
+            z-index: 1000;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 95%;
+            perspective: 1000px;
+            position: relative;
+            padding: clamp(15px, 3vw, 20px);
+        }
+
+        .envelope-wrapper {
+            position: relative;
+            width: 100%;
+            height: 400px;
+            cursor: pointer;
+            transform-style: preserve-3d;
+            transition: transform 0.6s ease, opacity 1.2s ease;
+            animation: envelope-entrance 1s ease-out;
+        }
+
+        @keyframes envelope-entrance {
+            0% {
+                opacity: 0;
+                transform: translateY(50px) scale(0.9);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .envelope {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(145deg, var(--beige-200), var(--beige-300));
+            border-radius: 0 0 25px 25px;
+            box-shadow:
+                0 25px 50px var(--shadow-deep),
+                inset 0 1px 0 rgba(255, 255, 255, 0.6);
+            border: 2px solid var(--beige-400);
+            overflow: hidden;
+            z-index: 10;
+            transition: opacity 1.2s ease;
+        }
+
+        .envelope::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, var(--gold), transparent, var(--gold));
+            border-radius: 0 0 25px 25px;
+            z-index: -1;
+            opacity: 0.3;
+        }
+
+        .envelope-flap {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(145deg, var(--beige-300), var(--beige-400));
+            transform-origin: bottom center;
+            transition: transform 1.2s cubic-bezier(0.23, 1, 0.32, 1);
+            z-index: 15;
+            border-bottom: 3px solid var(--beige-500);
+            clip-path: polygon(0 0, 100% 0, 50% 100%);
+            box-shadow:
+                0 15px 30px var(--shadow),
+                inset 0 2px 0 rgba(255, 255, 255, 0.4);
+        }
+
+        .envelope-flap::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80px;
+            height: 80px;
+            background: radial-gradient(circle, var(--gold) 0%, var(--gold-dark) 100%);
+            border-radius: 50%;
+            box-shadow:
+                0 8px 25px rgba(212, 175, 55, 0.4),
+                inset 0 2px 0 rgba(255, 255, 255, 0.3);
+            border: 4px solid var(--cream);
+            z-index: 1;
+        }
+
+        .envelope-flap::after {
+            content: '✉️';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 32px;
+            z-index: 2;
+            filter: drop-shadow(0 2px 4px var(--shadow));
+        }
+
+        .envelope-body {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 50%;
+            background: linear-gradient(145deg, var(--beige-200), var(--beige-300));
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            border-radius: 0 0 25px 25px;
+        }
+
+        .envelope-address {
+            text-align: center;
+            color: var(--beige-800);
+            font-family: 'Crimson Text', serif;
+        }
+
+        .from-line {
+            font-size: clamp(14px, 3vw, 16px);
+            font-weight: 600;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .to-line {
+            font-size: clamp(16px, 3.5vw, 18px);
+            font-weight: 600;
+            letter-spacing: 1.5px;
+            color: var(--beige-900);
+        }
+
+        .instruction {
+            font-size: clamp(10px, 2.5vw, 12px);
+            color: var(--beige-600);
+            font-family: 'Space Grotesk', sans-serif;
+            font-style: italic;
+            margin-top: 8px;
+            opacity: 0.8;
+        }
+
+        .letter-paper {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: clamp(280px, 70%, 380px);
+            aspect-ratio: 2 / 3;
+            max-height: 90vh;
+            min-height: 550px;
+            background: linear-gradient(145deg, var(--cream), var(--paper));
+            border-radius: 20px;
+            box-shadow:
+                0 30px 60px var(--shadow-deep),
+                inset 0 1px 0 rgba(255, 255, 255, 0.9);
+            opacity: 0;
+            z-index: 20;
+            transition: opacity 0.5s ease;
+            border: 1px solid var(--beige-300);
+            overflow: hidden;
+            transform-style: preserve-3d;
+        }
+
+        .letter-paper::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background:
+                repeating-linear-gradient(
+                    transparent,
+                    transparent 24px,
+                    rgba(160, 134, 104, 0.1) 24px,
+                    rgba(160, 134, 104, 0.1) 25px
+                );
+            pointer-events: none;
+            z-index: 21;
+        }
+
+        .letter-fold {
+            position: absolute;
+            width: 100%;
+            height: 33.33%;
+            background: transparent;
+            transform-origin: top;
+            transition: transform 0.8s cubic-bezier(0.23, 1, 0.32, 1), opacity 0.8s ease;
+            z-index: 19;
+            pointer-events: none;
+        }
+
+        .fold-top {
+            top: 0;
+            transform: rotateX(180deg);
+        }
+
+        .fold-middle {
+            top: 33.33%;
+            transform: rotateX(180deg);
+            transition-delay: 0.2s;
+        }
+
+        .fold-bottom {
+            top: 66.66%;
+            transform: rotateX(180deg);
+            transition-delay: 0.4s;
+        }
+
+        .letter-content-wrapper {
+            padding: clamp(25px, 5vw, 30px);
+            height: 100%;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: var(--beige-400) transparent;
+            -webkit-overflow-scrolling: touch;
+            z-index: 25;
+            background: var(--paper);
+            position: relative;
+        }
+
+        .letter-content-wrapper::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .letter-content-wrapper::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .letter-content-wrapper::-webkit-scrollbar-thumb {
+            background: var(--beige-400);
+            border-radius: 3px;
+        }
+
+        .close-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 35px;
+            height: 35px;
+            background: var(--gold);
+            color: var(--cream);
+            border: none;
+            border-radius: 50%;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(212, 175, 55, 0.3);
+            z-index: 26;
+            opacity: 0;
+            transform: scale(0) rotate(180deg);
+        }
+
+        .close-button:hover {
+            background: var(--gold-dark);
+            transform: scale(1.1) rotate(0deg);
+            box-shadow: 0 12px 35px rgba(212, 175, 55, 0.4);
+        }
+
+        .letter-header {
+            text-align: center;
+            margin-bottom: clamp(12px, 2.5vw, 15px);
+            padding-bottom: clamp(8px, 2vw, 10px);
+            border-bottom: 1px solid var(--beige-300);
+        }
+
+        .letter-title {
+            font-family: 'Crimson Text', serif;
+            font-size: clamp(18px, 4.5vw, 22px);
+            font-weight: 600;
+            color: var(--beige-900);
+            margin-bottom: 5px;
+            letter-spacing: 0.5px;
+        }
+
+        .letter-subtitle {
+            color: var(--beige-700);
+            font-size: clamp(10px, 2.5vw, 11px);
+            font-style: italic;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .letter-content {
+            line-height: 1.6;
+            color: var(--beige-800);
+            font-size: clamp(10px, 2.5vw, 11px);
+            font-family: 'Space Grotesk', sans-serif;
+            transition: transform 0.3s ease;
+        }
+
+        .letter-content:hover {
+            transform: scale(1.02);
+        }
+
+        .letter-content p {
+            margin-bottom: clamp(8px, 2vw, 10px);
+            text-align: justify;
+        }
+
+        .letter-signature {
+            text-align: right;
+            color: var(--beige-700);
+            font-weight: 500;
+            margin-top: clamp(12px, 2.5vw, 15px);
+            font-family: 'Crimson Text', serif;
+            font-size: clamp(11px, 3vw, 13px);
+            font-style: italic;
+        }
+
+        .photos-section {
+            margin-top: clamp(12px, 2.5vw, 15px);
+            padding-top: clamp(12px, 2.5vw, 15px);
+            border-top: 1px solid var(--beige-300);
+        }
+
+        .photos-title {
+            text-align: center;
+            color: var(--beige-900);
+            margin-bottom: clamp(8px, 2vw, 10px);
+            font-size: clamp(14px, 3.5vw, 16px);
+            font-weight: 600;
+            font-family: 'Crimson Text', serif;
+        }
+
+        .photos-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: clamp(8px, 2vw, 10px);
+        }
+
+        .photo-frame {
+            aspect-ratio: 1;
+            background: linear-gradient(145deg, var(--beige-200), var(--beige-300));
+            border-radius: 10px;
+            padding: 5px;
+            box-shadow:
+                0 10px 20px var(--shadow),
+                inset 0 1px 0 rgba(255, 255, 255, 0.6);
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            cursor: pointer;
+            overflow: hidden;
+            border: 1px solid var(--beige-400);
+            position: relative;
+        }
+
+        .photo-frame::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            transition: left 0.6s;
+        }
+
+        .photo-frame:hover::before {
+            left: 100%;
+        }
+
+        .photo-frame:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow:
+                0 15px 30px var(--shadow-deep),
+                inset 0 1px 0 rgba(255, 255, 255, 0.6);
+        }
+
+        .photo-frame img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 6px;
+            display: block;
+        }
+
+        .photo-placeholder {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, var(--beige-300), var(--beige-400));
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--beige-700);
+            font-size: clamp(14px, 4vw, 16px);
+        }
+
+        .controls {
+            position: fixed;
+            bottom: calc(25px + env(safe-area-inset-bottom));
+            left: 25px;
+            display: flex;
+            gap: 15px;
+            z-index: 1000;
+        }
+
+        .control-btn {
+            background: rgba(250, 248, 243, 0.95);
+            color: var(--beige-700);
+            border: 2px solid var(--beige-300);
+            border-radius: 15px;
+            padding: clamp(8px, 2vw, 10px) clamp(10px, 2.5vw, 12px);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: clamp(12px, 3vw, 14px);
+            backdrop-filter: blur(20px);
+            box-shadow: 0 10px 25px var(--shadow);
+        }
+
+        .control-btn:hover {
+            background: var(--gold);
+            color: var(--cream);
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(212, 175, 55, 0.3);
+        }
+
+        .hearts-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 15;
+        }
+
+        .heart {
+            position: absolute;
+            font-size: clamp(14px, 4vw, 16px);
+            animation: heart-float 5s ease-in-out infinite;
+            opacity: 0;
+        }
+
+        @keyframes heart-float {
+            0% { transform: translateY(100vh) rotate(0deg); opacity: 1; }
+            50% { opacity: 0.8; }
+            100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
+        }
+
+        /* States */
+        .envelope-wrapper.opened .envelope-flap {
+            transform: rotateX(-180deg);
+        }
+
+        .envelope-wrapper.opened .envelope {
+            opacity: 0;
+            z-index: 5;
+        }
+
+        .envelope-wrapper.opened .letter-paper {
+            opacity: 1;
+            transform: translate(-50%, -50%);
+        }
+
+        .envelope-wrapper.opened .fold-top,
+        .envelope-wrapper.opened .fold-middle,
+        .envelope-wrapper.opened .fold-bottom {
+            transform: rotateX(0deg);
+            opacity: 0;
+        }
+
+        .envelope-wrapper.opened .close-button {
+            opacity: 1;
+            transform: scale(1) rotate(0deg);
+        }
+
+        /* iPhone X, XS (375x812 logical pixels) */
+        @media only screen and (max-width: 375px) and (max-height: 812px) {
+            .container {
+                width: 90%;
+                padding: clamp(10px, 3vw, 15px);
+            }
+
+            .envelope-wrapper {
+                height: 320px;
+            }
+
+            .letter-paper {
+                width: clamp(260px, 85%, 340px);
+                max-height: 85vh;
+                min-height: 500px;
+            }
+
+            .letter-title {
+                font-size: clamp(16px, 4.5vw, 18px);
+            }
+
+            .letter-content {
+                font-size: clamp(9px, 2.5vw, 10px);
+            }
+
+            .letter-subtitle {
+                font-size: clamp(9px, 2.5vw, 10px);
+            }
+
+            .photos-grid {
+                grid-template-columns: 1fr;
+                gap: clamp(6px, 2vw, 8px);
+            }
+
+            .photos-title {
+                font-size: clamp(12px, 3.5vw, 14px);
+            }
+
+            .datetime-display {
+                top: calc(15px + env(safe-area-inset-top));
+                right: 15px;
+                font-size: clamp(9px, 2.5vw, 10px);
+                padding: clamp(8px, 2vw, 10px) clamp(10px, 2.5vw, 12px);
+            }
+
+            .controls {
+                bottom: calc(15px + env(safe-area-inset-bottom));
+                left: 15px;
+            }
+
+            .control-btn {
+                padding: clamp(6px, 2vw, 8px) clamp(8px, 2.5vw, 10px);
+                font-size: clamp(10px, 3vw, 12px);
+            }
+        }
+
+        /* iPhone XR, XS Max (414x896 logical pixels) */
+        @media only screen and (max-width: 414px) and (max-height: 896px) {
+            .container {
+                width: 90%;
+                padding: clamp(12px, 3vw, 18px);
+            }
+
+            .envelope-wrapper {
+                height: 340px;
+            }
+
+            .letter-paper {
+                width: clamp(280px, 85%, 360px);
+                max-height: 87vh;
+                min-height: 520px;
+            }
+
+            .letter-title {
+                font-size: clamp(17px, 4.5vw, 19px);
+            }
+
+            .letter-content {
+                font-size: clamp(9px, 2.5vw, 10px);
+            }
+
+            .letter-subtitle {
+                font-size: clamp(9px, 2.5vw, 10px);
+            }
+
+            .photos-grid {
+                grid-template-columns: 1fr;
+                gap: clamp(6px, 2vw, 8px);
+            }
+
+            .photos-title {
+                font-size: clamp(13px, 3.5vw, 15px);
+            }
+
+            .datetime-display {
+                top: calc(15px + env(safe-area-inset-top));
+                right: 15px;
+                font-size: clamp(9px, 2.5vw, 11px);
+                padding: clamp(8px, 2vw, 10px) clamp(10px, 2.5vw, 12px);
+            }
+
+            .controls {
+                bottom: calc(15px + env(safe-area-inset-bottom));
+                left: 15px;
+            }
+
+            .control-btn {
+                padding: clamp(6px, 2vw, 8px) clamp(8px, 2.5vw, 10px);
+                font-size: clamp(11px, 3vw, 13px);
+            }
+        }
+
+        /* General mobile fallback */
+        @media (max-width: 480px) {
+            .container {
+                width: 92%;
+                padding: clamp(10px, 3vw, 15px);
+            }
+
+            .envelope-wrapper {
+                height: 300px;
+            }
+
+            .letter-paper {
+                width: clamp(240px, 90%, 320px);
+                max-height: 80vh;
+                min-height: 480px;
+            }
+
+            .letter-title {
+                font-size: clamp(15px, 4.5vw, 17px);
+            }
+
+            .letter-content {
+                font-size: clamp(8px, 2.5vw, 9px);
+            }
+
+            .photos-grid {
+                grid-template-columns: 1fr;
+                gap: clamp(5px, 2vw, 6px);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="wood-texture"></div>
+    <div class="floating-particles" id="particles"></div>
+
+    <div class="datetime-display" id="datetime">
+        <div id="current-time"></div>
+        <div id="current-date"></div>
+    </div>
+
+    <div class="controls">
+        <button class="control-btn" id="sound-toggle">🔊</button>
+        <button class="control-btn" id="theme-toggle">🌙</button>
+    </div>
+
+    <div class="hearts-container" id="hearts"></div>
+
+    <div class="container">
+        <div class="envelope-wrapper" id="envelope-wrapper">
+            <div class="envelope">
+                <div class="envelope-flap" id="envelope-flap"></div>
+                <div class="envelope-body">
+                    <div class="envelope-address">
+                        <div class="from-line">from: chiyo</div>
+                        <div class="to-line">to: bb johnmark</div>
+                        <div class="instruction">Tap to open your letter</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="letter-paper" id="letter-paper">
+                <div class="letter-fold fold-top"></div>
+                <div class="letter-fold fold-middle"></div>
+                <div class="letter-fold fold-bottom"></div>
+                <button class="close-button" id="close-button">×</button>
+                <div class="letter-content-wrapper">
+                    <div class="letter-header">
+                        <div class="letter-title">to my gwapings na bb</div>
+                        <div class="letter-subtitle">basahin mo tas sabihin mo kung san ako nagkulang, eme!</div>
+                    </div>
+
+                    <div class="letter-content">
+                        <p>
+                            hi bb
+                            grabe yung message mo kagabi
+                            binasa ko siya paulit ulit kasi ang lambing mo sobra
+                            ang sarap sa puso basahin
+                            nafeel ko talaga yung sincerity mo
+                        </p><br>
+
+                        <p>
+                            ang saya ko rin na nagustuhan mo yung letter
+                            thank you sa appreciation
+                            ikaw kasi inspiration ko kaya ako naenjoy gawin yun
+                            worth it lahat pag ikaw yung pinapasaya ko
+                        </p><br>
+
+                        <p>
+                            thank you rin sa time mo kahapon
+                            ang saya ko na nakilala mo friends ko
+                            ang gaan lang ng moment
+                            and aliw ako kasi ang comfy mo agad sa kanila
+                            gusto ko yung energy mo with them
+                            and i loved seeing you enjoy
+                            ang cute mo sobra lalo na habang tumatawa ka
+                            ang ganda mo panoorin
+                        </p><br>
+
+                        <p>
+                            thank you rin sa honesty mo
+                            yung effort mo to improve para sa future natin
+                            sobrang big deal sakin yun
+                            lalo akong humanga sayo
+                            and wag mo kalimutan
+                            proud na proud din ako sayo
+                            lagi kitang susuportahan sa school
+                            and i'll do my best rin sa work
+                            para sabay tayong lumalaban
+                        </p><br>
+
+                        <p>
+                            thank you sa compliments mo
+                            kilig pa rin ako hanggang ngayon
+                            ikaw din bb
+                            pogi mo
+                            matamis ka magsalita
+                            pero mas matamis kang kasama
+                        </p><br>
+
+                        <p>
+                            miss na rin kita
+                            can't wait to see you later
+                            pagod ka man sa class
+                            gusto ko lang sabihin
+                            i'm here
+                            lagi
+                            iloveyou sobra 💗🫶
+                            kiss and hugs otw 💋
+                        </p><br>
+                    </div>
+
+
+                    <div class="letter-signature">
+                        your chinito bae,<br>
+                        — chiyo masikip
+                    </div>
+
+                    <div class="photos-section">
+                        <div class="photos-title">Our Moments</div>
+                        <div class="photos-grid">
+                            <div class="photo-frame">
+                                <img src="bb1.jpg" alt="Our memory 1" onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=\'photo-placeholder\'>📸</div>'">
+                            </div>
+                            <div class="photo-frame">
+                                <img src="bb2.jpg" alt="Our memory 2" onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=\'photo-placeholder\'>📸</div>'">
+                            </div>
+                            <div class="photo-frame">
+                                <img src="bb3.jpg" alt="Our memory 3" onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=\'photo-placeholder\'>📸</div>'">
+                            </div>
+                            <div class="photo-frame">
+                                <img src="bb4.jpg" alt="Our memory 4" onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=\'photo-placeholder\'>📸</div>'">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const envelopeWrapper = document.getElementById('envelope-wrapper');
+        const letterPaper = document.getElementById('letter-paper');
+        const closeButton = document.getElementById('close-button');
+        const heartsContainer = document.getElementById('hearts');
+        const soundToggle = document.getElementById('sound-toggle');
+        const themeToggle = document.getElementById('theme-toggle');
+        const particlesContainer = document.getElementById('particles');
+
+        let isOpened = false;
+        let soundEnabled = true;
+        let isDarkMode = false;
+
+        // Initialize particles
+        function createParticles() {
+            for (let i = 0; i < 20; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 8 + 's';
+                particle.style.animationDuration = (Math.random() * 4 + 6) + 's';
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        // Real-time clock
+        function updateDateTime() {
+            const now = new Date();
+            const timeOptions = {
+                timeZone: 'Asia/Manila',
+                hour12: true,
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            };
+
+            const dateOptions = {
+                timeZone: 'Asia/Manila',
+                weekday: 'short',
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            };
+
+            const timeString = now.toLocaleTimeString('en-US', timeOptions);
+            const dateString = now.toLocaleDateString('en-US', dateOptions);
+
+            document.getElementById('current-time').textContent = timeString;
+            document.getElementById('current-date').textContent = dateString;
+        }
+
+        // Sound effects
+        function playSound(frequency, duration, type = 'sine') {
+            if (!soundEnabled) return;
+
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+
+            oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
+            oscillator.type = type;
+
+            gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
+
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + duration);
+        }
+
+        // Create hearts animation
+        function createHearts() {
+            const heartSymbols = ['🤎', '🫶', '💛', '🧡', '🤍', '💗', '✨'];
+
+            for (let i = 0; i < 15; i++) {
+                setTimeout(() => {
+                    const heart = document.createElement('div');
+                    heart.className = 'heart';
+                    heart.innerHTML = heartSymbols[Math.floor(Math.random() * heartSymbols.length)];
+                    heart.style.left = Math.random() * 100 + '%';
+                    heart.style.animationDelay = Math.random() * 2 + 's';
+                    heart.style.animationDuration = (Math.random() * 3 + 4) + 's';
+                    heartsContainer.appendChild(heart);
+
+                    setTimeout(() => {
+                        heart.remove();
+                    }, 7000);
+                }, i * 200);
+            }
+        }
+
+        // Envelope opening
+        envelopeWrapper.addEventListener('click', function(e) {
+            if (e.target === closeButton) return;
+
+            if (!isOpened) {
+                playSound(800, 0.3);
+                envelopeWrapper.classList.add('opened');
+
+                setTimeout(() => {
+                    playSound(1200, 0.2);
+                    createHearts();
+                }, 800);
+
+                isOpened = true;
+            }
+        });
+
+        // Close letter
+        closeButton.addEventListener('click', function(e) {
+            e.stopPropagation();
+
+            playSound(600, 0.3);
+            envelopeWrapper.classList.remove('opened');
+
+            isOpened = false;
+        });
+
+        // Sound toggle
+        soundToggle.addEventListener('click', function() {
+            soundEnabled = !soundEnabled;
+            soundToggle.textContent = soundEnabled ? '🔊' : '🔇';
+
+            if (soundEnabled) {
+                playSound(800, 0.1);
+            }
+        });
+
+        // Theme toggle
+        themeToggle.addEventListener('click', function() {
+            isDarkMode = !isDarkMode;
+            themeToggle.textContent = isDarkMode ? '☀️' : '🌙';
+
+            if (isDarkMode) {
+                document.body.style.filter = 'invert(0.1) hue-rotate(180deg)';
+            } else {
+                document.body.style.filter = 'none';
+            }
+        });
+
+        // Photo interactions
+        const photoFrames = document.querySelectorAll('.photo-frame');
+        photoFrames.forEach(frame => {
+            frame.addEventListener('click', function() {
+                playSound(1000, 0.1);
+                this.style.transform = 'scale(1.1) rotate(2deg)';
+                this.style.boxShadow = '0 30px 60px rgba(0,0,0,0.3), 0 0 0 4px var(--gold)';
+
+                setTimeout(() => {
+                    this.style.transform = '';
+                    this.style.boxShadow = '';
+                }, 300);
+            });
+        });
+
+        // Mouse and touch parallax effect
+        function handleParallax(e) {
+            const x = (e.clientX / window.innerWidth - 0.5) * 2;
+            const y = (e.clientY / window.innerHeight - 0.5) * 2;
+
+            if (!isOpened) {
+                envelopeWrapper.style.transform = `perspective(1000px) rotateY(${x * 5}deg) rotateX(${y * 5}deg)`;
+            } else {
+                letterPaper.style.transform = `translate(-50%, -50%) perspective(1000px) rotateY(${x * 3}deg) rotateX(${y * 3}deg)`;
+            }
+        }
+
+        document.addEventListener('mousemove', handleParallax);
+        document.addEventListener('touchmove', function(e) {
+            const touch = e.touches[0];
+            handleParallax(touch);
+        });
+
+        // Initialize
+        updateDateTime();
+        setInterval(updateDateTime, 1000);
+        createParticles();
+
+        // Add initial animation
+        setTimeout(() => {
+            envelopeWrapper.style.animation = 'none';
+        }, 1000);
+    </script>
+</body>
+</html>
